@@ -1,0 +1,20 @@
+.main{
+    display: grid;
+    /* margin: 10px; */
+    grid-template-columns: repeat(5, minmax(200px, 1fr));
+    grid-template-rows: repeat(4, 1fr);
+}
+.settings{
+    background-color: aquamarine;
+    grid-column: span 4;
+}
+.sections{
+    background-color: #f0f0f0;
+    grid-row: span 3;
+}
+
+.questions{
+    background-color: #b0ffa3;
+    grid-column: span 4;
+    grid-row: span 3;
+}
