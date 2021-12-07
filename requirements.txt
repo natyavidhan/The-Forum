@@ -1,0 +1,6 @@
+flask
+Authlib
+requests
+config
+loginpass
+pymongo
