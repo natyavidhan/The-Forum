@@ -10,8 +10,7 @@ class Database:
         self.client = MongoClient(config.MONGO_URL)
         self.db = self.client.TheForum
         self.users = self.db.users
-        self.posts = self.db.posts
-        self.tagsdb = self.db.tagsDB
+        self.questions = self.db.questions
         
     def addUser(self, email):
         name = email.split('@')[0]
@@ -37,3 +36,20 @@ class Database:
     def updateName(self, email, name):
         self.users.update_one({'email': email}, {'$set': {'username': name}})
         return True
+    
+    def postQuestion(self, email, title, body, tags):
+        user = self.getUser(email)
+        id = str(uuid4())
+        self.questions.insert_one({
+            '_id': id,
+            'title': title,
+            'body': body,
+            'tags': tags,
+            'user': user['_id'],
+            'created': datetime.datetime.now().strftime("%d %B %Y, %I:%M:%S %p"),
+            'upvotes': [],
+            'comments': [],
+            'answers': []
+        })
+        self.users.update_one({'_id': user['_id']}, {'$push': {'questions': id}}, upsert=True)
+        

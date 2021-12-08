@@ -31,6 +31,19 @@ def changeName():
         database.updateName(user['email'], name)
         return "Updated!"
     return abort(404)
+
+@app.route('/new', methods=['GET', 'POST'])
+def new():
+    if 'user' in session:
+        if request.method == 'GET':
+            return render_template('new.html')
+        else:
+            question = request.form.get('question')
+            explaination = request.form.get('explaination')
+            tags = request.form.get('tags').split(',')
+            database.postQuestion(session['user']['email'], question, explaination, tags)
+        return redirect(url_for('home'))
+    return redirect(url_for('home'))
     
 def handle_authorize(remote, token, user_info):
     if database.userExists(user_info['email']):

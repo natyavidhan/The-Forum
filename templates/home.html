@@ -11,6 +11,18 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="/">The Forum</a>
+          <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+              <a class="nav-link active" aria-current="page" href="/">Home</a>
+              <a class="nav-link" href="/new">New</a>
+              <a class="nav-link" href="/logout">Logout</a>
+            </div>
+          </div>
+        </div>
+      </nav>
     <div class="container mt-5 text-center main">
         <div class="user"><img src="{{user['avatar']}}" alt="" height="150px"></div>
         <div class="settings"><h2 class="username mt-3">{{user['username']}}</h2>
