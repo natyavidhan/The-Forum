@@ -14,7 +14,10 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
           <a class="navbar-brand" href="/">The Forum</a>
-          <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
             <div class="navbar-nav">
               <a class="nav-link active" aria-current="page" href="/">Home</a>
               <a class="nav-link" href="/new">New</a>
@@ -23,12 +26,36 @@
           </div>
         </div>
       </nav>
-    <div class="container mt-5 text-center main">
-        <div class="user"><img src="{{user['avatar']}}" alt="" height="150px"></div>
-        <div class="settings"><h2 class="username mt-3">{{user['username']}}</h2>
-        <div class="changename"><input type="text" name="" id="newname" class="nameimput"> <button class="change btn btn-warning btn-sm" onclick="changeName()">Change</button></div></div>
+    <div class="container mt-5 main">
+        <div class="user text-center"><img src="{{user['avatar']}}" alt="" height="150px"></div>
+        <div class="settings text-center"><h2 class="username mt-3">{{user['username']}}</h2>
+        <div class="changename text-center"><input type="text" name="" id="newname" class="nameimput"> <button class="change btn btn-warning btn-sm" onclick="changeName()">Change</button></div></div>
         <div class="sections">e</div>
-        <div class="questions">e</div>
+        <div class="questions">
+            {% for question in questions %}
+                <div class="question">
+                    <div class="question-header">
+                        <h3 class="question-title">{{question['title']}}</h3>
+                        <div class="question-author">By: {{question['user']['username']}}</div>
+                    </div>
+                    <div class="question-footer">
+                        <div class="question-date text-muted">On: {{question['created']}}</div>
+                    </div>
+                    <div class="votes">
+                        <div class="upvote">
+                            <button class="upvote-button btn btn-success btn-sm" onclick="upvote(`{{question['_id']}}`)">
+                                <img src="https://cdn-icons-png.flaticon.com/512/6367/6367813.png" alt="" height="26px">
+                            </button>
+                        </div>
+                        <div class="downvote">
+                            <button class="downvote-button btn btn-danger btn-sm" onclick="downvote(`{{question['_id']}}`)">
+                                <img src="https://cdn-icons-png.flaticon.com/512/6367/6367813.png" alt="" height="26px" style="transform: rotate(180deg);">
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
     </div>
     <script src="/static/js/index.js"></script>
     <script>

@@ -53,3 +53,5 @@ class Database:
         })
         self.users.update_one({'_id': user['_id']}, {'$push': {'questions': id}}, upsert=True)
         
+    def getMostUpvotedQuestions(self):
+        return [question for question in self.questions.find().sort('upvotes', -1).limit(10)]

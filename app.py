@@ -14,7 +14,10 @@ backends = [GitHub]
 @app.route('/')
 def home():
     if 'user' in session:
-        return render_template('home.html', user= session['user'])
+        questions = database.getMostUpvotedQuestions()
+        for question in questions:
+            question['user'] = database.getUserWithId(question['user'])
+        return render_template('home.html', user= session['user'], questions=questions)
     return render_template('index.html')
 
 @app.route('/changeName', methods=['POST'])
