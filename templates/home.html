@@ -30,25 +30,36 @@
         <div class="user text-center"><img src="{{user['avatar']}}" alt="" height="150px"></div>
         <div class="settings text-center"><h2 class="username mt-3">{{user['username']}}</h2>
         <div class="changename text-center"><input type="text" name="" id="newname" class="nameimput"> <button class="change btn btn-warning btn-sm" onclick="changeName()">Change</button></div></div>
-        <div class="sections">e</div>
+        <div class="sections">
+            <div class="points text-muted">Points: {{user['points']}}</div>
+        </div>
         <div class="questions">
             {% for question in questions %}
                 <div class="question">
                     <div class="question-header">
-                        <h3 class="question-title">{{question['title']}}</h3>
+                        <h3 class="question-title"><a href="/question/{{question['_id']}}">{{question['title']}}</a></h3>
                         <div class="question-author">By: {{question['user']['username']}}</div>
                     </div>
                     <div class="question-footer">
                         <div class="question-date text-muted">On: {{question['created']}}</div>
                     </div>
                     <div class="votes">
+                        {% if user['_id'] in question['upvotes'] %}
                         <div class="upvote">
-                            <button class="upvote-button btn btn-success btn-sm" onclick="upvote(`{{question['_id']}}`)">
+                            <button class="upvote-button btn btn-success btn-sm" id="{{question['_id']}}up" onclick="upvote(`{{question['_id']}}`)">
                                 <img src="https://cdn-icons-png.flaticon.com/512/6367/6367813.png" alt="" height="26px">
                             </button>
                         </div>
+                        {% else %}
+                        <div class="upvote">
+                            <button class="upvote-button btn btn-outline-success btn-sm" id="{{question['_id']}}up" onclick="upvote(`{{question['_id']}}`)">
+                                <img src="https://cdn-icons-png.flaticon.com/512/6367/6367813.png" alt="" height="26px">
+                            </button>
+                        </div>
+                        {% endif %}
+                        <div class="votes-count" id="{{question['_id']}}count">{{question['upvotes']|length}}</div>
                         <div class="downvote">
-                            <button class="downvote-button btn btn-danger btn-sm" onclick="downvote(`{{question['_id']}}`)">
+                            <button class="downvote-button btn btn-outline-danger btn-sm" id="{{question['_id']}}down" onclick="downvote(`{{question['_id']}}`)">
                                 <img src="https://cdn-icons-png.flaticon.com/512/6367/6367813.png" alt="" height="26px" style="transform: rotate(180deg);">
                             </button>
                         </div>
@@ -75,6 +86,29 @@
                     }
                 }
             });
+        }
+        function upvote(id){
+            if ($("#"+id+"up").hasClass('btn-success')){
+                $.ajax({
+                    url: "/upvote/"+id,
+                    type: "POST",
+                    success: function(data) {
+                        $("#"+id+"up").removeClass('btn-success');
+                        $("#"+id+"up").addClass('btn-outline-success');
+                        $("#"+id+"count").text(parseInt($("#"+id+"count").text())-1);
+                    }
+                });
+            } else{
+                $.ajax({
+                    url: "/upvote/"+id,
+                    type: "POST",
+                    success: function(data) {
+                        $("#"+id+"up").addClass('btn-success');
+                        $("#"+id+"up").removeClass('btn-outline-success');
+                        $("#"+id+"count").text(parseInt($("#"+id+"count").text())+1);
+                    }
+                });
+            }
         }
     </script>
 </body>

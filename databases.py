@@ -21,6 +21,7 @@ class Database:
             'username': name,
             'avatar': f"https://avatars.dicebear.com/api/bottts/{id}.svg",
             'email': email,
+            'points': 0,
             'created': datetime.datetime.now().strftime("%d %B %Y, %I:%M:%S %p")
         })
     
@@ -48,6 +49,7 @@ class Database:
             'user': user['_id'],
             'created': datetime.datetime.now().strftime("%d %B %Y, %I:%M:%S %p"),
             'upvotes': [],
+            'downvotes': [],
             'comments': [],
             'answers': []
         })
@@ -55,3 +57,26 @@ class Database:
         
     def getMostUpvotedQuestions(self):
         return [question for question in self.questions.find().sort('upvotes', -1).limit(10)]
+    
+    def getQuestion(self, id):
+        return self.questions.find_one({'_id': id})
+    
+    def upvoteQuestion(self, id, user):
+        question = self.getQuestion(id)
+        if user not in question['upvotes']:
+            self.questions.update_one({'_id': id}, {'$push': {'upvotes': user}})
+            self.users.update_one({'_id': question['user']}, {'$inc': {'points': 1}}, upsert=True)
+            self.users.update_one({'_id': user}, {'$push': {'upvoted': id}}, upsert=True)
+            return True
+        return False
+    
+    def removeUpvote(self, id, user):
+        question = self.getQuestion(id)
+        if user in question['upvotes']:
+            self.questions.update_one({'_id': id}, {'$pull': {'upvotes': user}})
+            self.users.update_one({'_id': question['user']}, {'$inc': {'points': -1}}, upsert=True)
+            self.users.update_one({'_id': user}, {'$pull': {'upvoted': id}}, upsert=True)
+            return True
+        return False
+    
+        

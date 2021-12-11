@@ -14,10 +14,11 @@ backends = [GitHub]
 @app.route('/')
 def home():
     if 'user' in session:
+        session['user'] = database.getUserWithId(session['user']['_id'])
         questions = database.getMostUpvotedQuestions()
         for question in questions:
             question['user'] = database.getUserWithId(question['user'])
-        return render_template('home.html', user= session['user'], questions=questions)
+        return render_template('home.html', user=session['user'], questions=questions)
     return render_template('index.html')
 
 @app.route('/changeName', methods=['POST'])
@@ -47,7 +48,32 @@ def new():
             database.postQuestion(session['user']['email'], question, explaination, tags)
         return redirect(url_for('home'))
     return redirect(url_for('home'))
-    
+
+@app.route('/question/<id>', methods=['GET'])
+def question(id):
+    if 'user' in session:
+        question = database.getQuestion(id)
+        if question is None:
+            return abort(404)
+        question['user'] = database.getUserWithId(question['user'])
+        return render_template('question.html', user=session['user'], question=question)
+    return redirect(url_for('home'))
+
+@app.route('/upvote/<id>', methods=['POST'])
+def upvote(id):
+    if 'user' in session:
+        result = database.upvoteQuestion(id, session['user']['_id'])
+        if not result:
+            database.removeUpvote(id, user=session['user']['_id'])
+        return "ok"
+    return redirect(url_for('home'))
+
+@app.route('/logout')
+def logout():
+    if 'user' in session:
+        session.pop('user', None)
+    return redirect(url_for('home'))
+
 def handle_authorize(remote, token, user_info):
     if not database.userExists(user_info['email']):
         database.addUser(user_info['email'])

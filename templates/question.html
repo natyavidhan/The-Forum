@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{{question['title']}} | The Forum</title>
+    <link rel="stylesheet" href="/static/css/question.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="/">The Forum</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <div class="navbar-nav">
+              <a class="nav-link active" aria-current="page" href="/">Home</a>
+              <a class="nav-link" href="/new">New</a>
+              <a class="nav-link" href="/logout">Logout</a>
+            </div>
+          </div>
+        </div>
+      </nav>
+    <div class="container mt-5 main">
+        <div class="question">
+                <div class="votes">
+                    <div class="upvote">
+                        <a href="/upvote/{{question['_id']}}">
+                            <img src="https://cdn-icons-png.flaticon.com/512/6367/6367813.png" alt="upvote" height="26px">
+                        </a>
+                    </div>
+                    <div class="score">
+                        {{question['score']}}
+                    </div>
+                    <div class="downvote">
+                        <a href="/downvote/{{question['_id']}}">
+                            <img src="https://cdn-icons-png.flaticon.com/512/6367/6367813.png" alt="downvote" height="26px" style="transform: rotate(180deg);">
+                        </a>
+                    </div>
+                </div>
+                <h1 class="question-title">{{question['title']}}</h1>
+                <div class="question-info">
+                    <p class="text-muted">By: {{question['user']['username']}} <br>
+                        On: {{question['created']}}
+                    </p>
+                </div>
+            <h5 class="question-content">{{question['body']}}</h5>
+        </div>
+    </div>
+    <script src="/static/js/index.js"></script>
+    <script>
+    </script>
+</body>
+</html>

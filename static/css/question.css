@@ -1,0 +1,14 @@
+.question{
+    background-color: aquamarine;
+    border-radius: 10px;
+    padding: 10px;
+    display: grid;
+    grid-template-columns: 1fr 30fr;
+    align-items: center;
+}
+.question-info{
+    grid-column-start: 2;
+}
+.question-content{
+    grid-column-start: 2;
+}
