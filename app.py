@@ -68,6 +68,15 @@ def upvote(id):
         return "ok"
     return redirect(url_for('home'))
 
+@app.route('/downvote/<id>', methods=['POST'])
+def downvote(id):
+    if 'user' in session:
+        result = database.downvoteQuestion(id, session['user']['_id'])
+        if not result:
+            database.removeDownvote(id, user=session['user']['_id'])
+        return "ok"
+    return redirect(url_for('home'))
+
 @app.route('/logout')
 def logout():
     if 'user' in session:

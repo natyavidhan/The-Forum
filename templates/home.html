@@ -44,24 +44,28 @@
                         <div class="question-date text-muted">On: {{question['created']}}</div>
                     </div>
                     <div class="votes">
-                        {% if user['_id'] in question['upvotes'] %}
                         <div class="upvote">
+                        {% if user['_id'] in question['upvotes'] %}
                             <button class="upvote-button btn btn-success btn-sm" id="{{question['_id']}}up" onclick="upvote(`{{question['_id']}}`)">
                                 <img src="https://cdn-icons-png.flaticon.com/512/6367/6367813.png" alt="" height="26px">
                             </button>
-                        </div>
                         {% else %}
-                        <div class="upvote">
                             <button class="upvote-button btn btn-outline-success btn-sm" id="{{question['_id']}}up" onclick="upvote(`{{question['_id']}}`)">
                                 <img src="https://cdn-icons-png.flaticon.com/512/6367/6367813.png" alt="" height="26px">
                             </button>
-                        </div>
                         {% endif %}
-                        <div class="votes-count" id="{{question['_id']}}count">{{question['upvotes']|length}}</div>
+                        </div>
+                        <div class="votes-count" id="{{question['_id']}}count">{{question['upvotes']|length - question['downvotes']|length}}</div>
                         <div class="downvote">
-                            <button class="downvote-button btn btn-outline-danger btn-sm" id="{{question['_id']}}down" onclick="downvote(`{{question['_id']}}`)">
-                                <img src="https://cdn-icons-png.flaticon.com/512/6367/6367813.png" alt="" height="26px" style="transform: rotate(180deg);">
-                            </button>
+                            {% if user['_id'] in question['downvotes'] %}
+                                <button class="downvote-button btn btn-danger btn-sm" id="{{question['_id']}}down" onclick="downvote(`{{question['_id']}}`)">
+                                    <img src="https://cdn-icons-png.flaticon.com/512/6367/6367813.png" alt="" height="26px" style="transform: rotate(180deg);">
+                                </button>
+                            {% else %}
+                                <button class="downvote-button btn btn-outline-danger btn-sm" id="{{question['_id']}}down" onclick="downvote(`{{question['_id']}}`)">
+                                    <img src="https://cdn-icons-png.flaticon.com/512/6367/6367813.png" alt="" height="26px" style="transform: rotate(180deg);">
+                                </button>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -106,6 +110,29 @@
                         $("#"+id+"up").addClass('btn-success');
                         $("#"+id+"up").removeClass('btn-outline-success');
                         $("#"+id+"count").text(parseInt($("#"+id+"count").text())+1);
+                    }
+                });
+            }
+        }
+        function downvote(id){
+            if ($("#"+id+"down").hasClass('btn-danger')){
+                $.ajax({
+                    url: "/downvote/"+id,
+                    type: "POST",
+                    success: function(data) {
+                        $("#"+id+"down").removeClass('btn-danger');
+                        $("#"+id+"down").addClass('btn-outline-danger');
+                        $("#"+id+"count").text(parseInt($("#"+id+"count").text())+1);
+                    }
+                });
+            } else{
+                $.ajax({
+                    url: "/downvote/"+id,
+                    type: "POST",
+                    success: function(data) {
+                        $("#"+id+"down").addClass('btn-danger');
+                        $("#"+id+"down").removeClass('btn-outline-danger');
+                        $("#"+id+"count").text(parseInt($("#"+id+"count").text())-1);
                     }
                 });
             }

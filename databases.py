@@ -79,4 +79,22 @@ class Database:
             return True
         return False
     
+    def downvoteQuestion(self, id, user):
+        question = self.getQuestion(id)
+        if user not in question['downvotes']:
+            self.questions.update_one({'_id': id}, {'$push': {'downvotes': user}})
+            self.users.update_one({'_id': question['user']}, {'$inc': {'points': -1}}, upsert=True)
+            self.users.update_one({'_id': user}, {'$push': {'downvoted': id}}, upsert=True)
+            return True
+        return False
+    
+    def removeDownvote(self, id, user):
+        question = self.getQuestion(id)
+        if user in question['downvotes']:
+            self.questions.update_one({'_id': id}, {'$pull': {'downvotes': user}})
+            self.users.update_one({'_id': question['user']}, {'$inc': {'points': 1}}, upsert=True)
+            self.users.update_one({'_id': user}, {'$pull': {'downvoted': id}}, upsert=True)
+            return True
+        return False
+    
         
