@@ -30,30 +30,178 @@
         <div class="question">
                 <div class="votes">
                     <div class="upvote">
-                        <a href="/upvote/{{question['_id']}}">
-                            <img src="https://cdn-icons-png.flaticon.com/512/6367/6367813.png" alt="upvote" height="26px">
-                        </a>
+                    {% if user['_id'] in question['upvotes'] %}
+                        <button class="upvote-button btn btn-success btn-sm" id="{{question['_id']}}up" onclick="upvote(`{{question['_id']}}`)">
+                            <img src="https://cdn-icons-png.flaticon.com/512/6367/6367813.png" alt="" height="26px">
+                        </button>
+                    {% else %}
+                        <button class="upvote-button btn btn-outline-success btn-sm" id="{{question['_id']}}up" onclick="upvote(`{{question['_id']}}`)">
+                            <img src="https://cdn-icons-png.flaticon.com/512/6367/6367813.png" alt="" height="26px">
+                        </button>
+                    {% endif %}
                     </div>
-                    <div class="score">
-                        {{question['score']}}
-                    </div>
+                    <div class="votes-count" id="{{question['_id']}}count">{{question['upvotes']|length - question['downvotes']|length}}</div>
                     <div class="downvote">
-                        <a href="/downvote/{{question['_id']}}">
-                            <img src="https://cdn-icons-png.flaticon.com/512/6367/6367813.png" alt="downvote" height="26px" style="transform: rotate(180deg);">
-                        </a>
+                        {% if user['_id'] in question['downvotes'] %}
+                            <button class="downvote-button btn btn-danger btn-sm" id="{{question['_id']}}down" onclick="downvote(`{{question['_id']}}`)">
+                                <img src="https://cdn-icons-png.flaticon.com/512/6367/6367813.png" alt="" height="26px" style="transform: rotate(180deg);">
+                            </button>
+                        {% else %}
+                            <button class="downvote-button btn btn-outline-danger btn-sm" id="{{question['_id']}}down" onclick="downvote(`{{question['_id']}}`)">
+                                <img src="https://cdn-icons-png.flaticon.com/512/6367/6367813.png" alt="" height="26px" style="transform: rotate(180deg);">
+                            </button>
+                        {% endif %}
                     </div>
                 </div>
-                <h1 class="question-title">{{question['title']}}</h1>
-                <div class="question-info">
-                    <p class="text-muted">By: {{question['user']['username']}} <br>
-                        On: {{question['created']}}
-                    </p>
+                <div class="question-title">
+                    <div class="question-info">
+                        <p class="text-muted">By: {{question['user']['username']}} On: {{question['created']}}</p>
+                    </div>
+                    <h1>
+                        {{question['title']}}
+                    </h1>
                 </div>
             <h5 class="question-content">{{question['body']}}</h5>
         </div>
+        <div class="add-answer">
+            <form action="/question/{{question['_id']}}/answer" method="POST">
+                <div class="form-group">
+                    <label for="answer">Answer</label>
+                    <textarea class="form-control" id="answer" name="answer" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+        {% for answer in question['answers'] %}
+            <div class="answer" id="{{answer['_id']}}">
+                <div class="votes">
+                    <div class="upvote">
+                    {% if user['_id'] in answer['upvotes'] %}
+                        <button class="upvote-button btn btn-success btn-sm" id="{{answer['_id']}}up" onclick="upvoteAnswer(`{{question['_id']}}`, `{{answer['_id']}}`)">
+                            <img src="https://cdn-icons-png.flaticon.com/512/6367/6367813.png" alt="" height="26px">
+                        </button>
+                    {% else %}
+                        <button class="upvote-button btn btn-outline-success btn-sm" id="{{answer['_id']}}up" onclick="upvoteAnswer(`{{question['_id']}}`, `{{answer['_id']}}`)">
+                            <img src="https://cdn-icons-png.flaticon.com/512/6367/6367813.png" alt="" height="26px">
+                        </button>
+                    {% endif %}
+                    </div>
+                    <div class="votes-count" id="{{answer['_id']}}count">{{answer['upvotes']|length - answer['downvotes']|length}}</div>
+                    <div class="downvote">
+                        {% if user['_id'] in answer['downvotes'] %}
+                            <button class="downvote-button btn btn-danger btn-sm" id="{{answer['_id']}}down" onclick="downvoteAnswer(`{{question['_id']}}`, `{{answer['_id']}}`)">
+                                <img src="https://cdn-icons-png.flaticon.com/512/6367/6367813.png" alt="" height="26px" style="transform: rotate(180deg);">
+                            </button>
+                        {% else %}
+                            <button class="downvote-button btn btn-outline-danger btn-sm" id="{{answer['_id']}}down" onclick="downvoteAnswer(`{{question['_id']}}`, `{{answer['_id']}}`)">
+                                <img src="https://cdn-icons-png.flaticon.com/512/6367/6367813.png" alt="" height="26px" style="transform: rotate(180deg);">
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="question-title">
+                    <div class="question-info">
+                        <p class="text-muted">By: {{answer['user']['username']}} On: {{answer['created']}}</p>
+                    </div>
+                    <h5 class="question-content">{{answer['body']}}</h5>
+                </div>
+            </div>
+        {% endfor %}
     </div>
     <script src="/static/js/index.js"></script>
     <script>
+        function upvote(id){
+            if ($("#"+id+"up").hasClass('btn-success')){
+                $.ajax({
+                    url: "/upvote/"+id,
+                    type: "POST",
+                    success: function(data) {
+                        $("#"+id+"up").removeClass('btn-success');
+                        $("#"+id+"up").addClass('btn-outline-success');
+                        $("#"+id+"count").text(parseInt($("#"+id+"count").text())-1);
+                    }
+                });
+            } else{
+                $.ajax({
+                    url: "/upvote/"+id,
+                    type: "POST",
+                    success: function(data) {
+                        $("#"+id+"up").addClass('btn-success');
+                        $("#"+id+"up").removeClass('btn-outline-success');
+                        $("#"+id+"count").text(parseInt($("#"+id+"count").text())+1);
+                    }
+                });
+            }
+        }
+        function downvote(id){
+            if ($("#"+id+"down").hasClass('btn-danger')){
+                $.ajax({
+                    url: "/downvote/"+id,
+                    type: "POST",
+                    success: function(data) {
+                        $("#"+id+"down").removeClass('btn-danger');
+                        $("#"+id+"down").addClass('btn-outline-danger');
+                        $("#"+id+"count").text(parseInt($("#"+id+"count").text())+1);
+                    }
+                });
+            } else{
+                $.ajax({
+                    url: "/downvote/"+id,
+                    type: "POST",
+                    success: function(data) {
+                        $("#"+id+"down").addClass('btn-danger');
+                        $("#"+id+"down").removeClass('btn-outline-danger');
+                        $("#"+id+"count").text(parseInt($("#"+id+"count").text())-1);
+                    }
+                });
+            }
+        }
+        function upvoteAnswer(question, answer){
+            if ($("#"+answer+"up").hasClass('btn-success')){
+                $.ajax({
+                    url: `/upvote/${question}/${answer}`,
+                    type: "POST",
+                    success: function(data) {
+                        $("#"+answer+"up").removeClass('btn-success');
+                        $("#"+answer+"up").addClass('btn-outline-success');
+                        $("#"+answer+"count").text(parseInt($("#"+answer+"count").text())-1);
+                    }
+                });
+            } else{
+                $.ajax({
+                    url: `/upvote/${question}/${answer}`,
+                    type: "POST",
+                    success: function(data) {
+                        $("#"+answer+"up").addClass('btn-success');
+                        $("#"+answer+"up").removeClass('btn-outline-success');
+                        $("#"+answer+"count").text(parseInt($("#"+answer+"count").text())+1);
+                    }
+                });
+            }
+        }
+        function downvoteAnswer(question, answer){
+            if ($("#"+answer+"down").hasClass('btn-danger')){
+                $.ajax({
+                    url: `/downvote/${question}/${answer}`,
+                    type: "POST",
+                    success: function(data) {
+                        $("#"+answer+"down").removeClass('btn-danger');
+                        $("#"+answer+"down").addClass('btn-outline-danger');
+                        $("#"+answer+"count").text(parseInt($("#"+answer+"count").text())+1);
+                    }
+                });
+            } else{
+                $.ajax({
+                    url: `/downvote/${question}/${answer}`,
+                    type: "POST",
+                    success: function(data) {
+                        $("#"+answer+"down").addClass('btn-danger');
+                        $("#"+answer+"down").removeClass('btn-outline-danger');
+                        $("#"+answer+"count").text(parseInt($("#"+answer+"count").text())-1);
+                    }
+                });
+            }
+        }
     </script>
 </body>
 </html>

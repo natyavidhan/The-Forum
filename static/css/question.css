@@ -1,5 +1,9 @@
+:root{
+    --color-div-back: #d8d8d8;
+}
+
 .question{
-    background-color: aquamarine;
+    background-color: var(--color-div-back);
     border-radius: 10px;
     padding: 10px;
     display: grid;
@@ -11,4 +15,27 @@
 }
 .question-content{
     grid-column-start: 2;
+}
+.votes{
+    display: grid;
+    justify-items: center;
+    padding: 10px;
+}
+.add-answer{
+    background-color: var(--color-div-back);
+    border-radius: 10px;
+    padding: 10px;
+}
+.main{
+    display: grid;
+    grid-template-rows: 1fr;
+    gap: 15px;
+}
+.answer{
+    background-color: var(--color-div-back);
+    border-radius: 10px;
+    padding: 10px;
+    display: grid;
+    grid-template-columns: 1fr 30fr;
+    align-items: center;
 }

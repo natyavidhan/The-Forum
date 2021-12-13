@@ -59,7 +59,10 @@ class Database:
         return [question for question in self.questions.find().sort('upvotes', -1).limit(10)]
     
     def getQuestion(self, id):
-        return self.questions.find_one({'_id': id})
+        question = self.questions.find_one({'_id': id})
+        answers = sorted(question['answers'], key=lambda votes: votes['upvotes'], reverse=True)
+        question['answers'] = answers
+        return question 
     
     def upvoteQuestion(self, id, user):
         question = self.getQuestion(id)
@@ -96,5 +99,48 @@ class Database:
             self.users.update_one({'_id': user}, {'$pull': {'downvoted': id}}, upsert=True)
             return True
         return False
+
+    def addAnswer(self, id, user, body):
+        question = self.getQuestion(id)
+        self.questions.update_one({'_id': id}, {'$push': {'answers': {'_id': str(uuid4()), 'user': user, 'body': body, 'created': datetime.datetime.now().strftime("%d %B %Y, %I:%M:%S %p"), 'upvotes': [], 'downvotes': []}}})
+        self.users.update_one({'_id': user}, {'$push': {'answered': id}}, upsert=True)
     
-        
+    def upvoteAnswer(self, questionID, answerID, user):
+        question = self.questions.find_one({'_id': questionID})
+        answer = [answer for answer in question['answers'] if answer['_id'] == answerID][0]
+        if user not in answer['upvotes']:
+            answer['upvotes'].append(user)
+            self.questions.update_one({'_id': questionID, 'answers._id': answerID}, {'$set': {'answers.$.upvotes': answer['upvotes']}})
+            self.users.update_one({'_id': user}, {'$inc': {'points': 1}}, upsert=True)
+            return True
+        return False
+    
+    def removeUpvoteAnswer(self, questionID, answerID, user):
+        question = self.questions.find_one({'_id': questionID})
+        answer = [answer for answer in question['answers'] if answer['_id'] == answerID][0]
+        if user in answer['upvotes']:
+            answer['upvotes'].remove(user)
+            self.questions.update_one({'_id': questionID, 'answers._id': answerID}, {'$set': {'answers.$.upvotes': answer['upvotes']}})
+            self.users.update_one({'_id': user}, {'$inc': {'points': -1}}, upsert=True)
+            return True
+        return False
+    
+    def downvoteAnswer(self, questionID, answerID, user):
+        question = self.questions.find_one({'_id': questionID})
+        answer = [answer for answer in question['answers'] if answer['_id'] == answerID][0]
+        if user not in answer['downvotes']:
+            answer['downvotes'].append(user)
+            self.questions.update_one({'_id': questionID, 'answers._id': answerID}, {'$set': {'answers.$.downvotes': answer['downvotes']}})
+            self.users.update_one({'_id': user}, {'$inc': {'points': -1}}, upsert=True)
+            return True
+        return False
+    
+    def removeDownvoteAnswer(self, questionID, answerID, user):
+        question = self.questions.find_one({'_id': questionID})
+        answer = [answer for answer in question['answers'] if answer['_id'] == answerID][0]
+        if user in answer['downvotes']:
+            answer['downvotes'].remove(user)
+            self.questions.update_one({'_id': questionID, 'answers._id': answerID}, {'$set': {'answers.$.downvotes': answer['downvotes']}})
+            self.users.update_one({'_id': user}, {'$inc': {'points': 1}}, upsert=True)
+            return True
+        return False

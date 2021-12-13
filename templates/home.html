@@ -30,8 +30,8 @@
         <div class="user text-center"><img src="{{user['avatar']}}" alt="" height="150px"></div>
         <div class="settings text-center"><h2 class="username mt-3">{{user['username']}}</h2>
         <div class="changename text-center"><input type="text" name="" id="newname" class="nameimput"> <button class="change btn btn-warning btn-sm" onclick="changeName()">Change</button></div></div>
-        <div class="sections">
-            <div class="points text-muted">Points: {{user['points']}}</div>
+        <div class="sections text-center">
+            <div class="points text-muted mt-3">Points: {{user['points']}}</div>
         </div>
         <div class="questions">
             {% for question in questions %}

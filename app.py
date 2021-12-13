@@ -56,6 +56,8 @@ def question(id):
         if question is None:
             return abort(404)
         question['user'] = database.getUserWithId(question['user'])
+        for answer in question['answers']:
+            answer['user'] = database.getUserWithId(answer['user'])
         return render_template('question.html', user=session['user'], question=question)
     return redirect(url_for('home'))
 
@@ -75,6 +77,35 @@ def downvote(id):
         if not result:
             database.removeDownvote(id, user=session['user']['_id'])
         return "ok"
+    return redirect(url_for('home'))
+
+@app.route('/upvote/<question>/<answer>', methods=['POST'])
+def upvoteAnswer(question, answer):
+    print(question, answer)
+    if 'user' in session:
+        result = database.upvoteAnswer(question, answer, session['user']['_id'])
+        print(result)
+        if not result:
+            database.removeUpvoteAnswer(question, answer, user=session['user']['_id'])
+            print("removed")
+        return "ok"
+    return redirect(url_for('home'))
+
+@app.route('/downvote/<question>/<answer>', methods=['POST'])
+def downvoteAnswer(question, answer):
+    if 'user' in session:
+        result = database.downvoteAnswer(question, answer, session['user']['_id'])
+        if not result:
+            database.removeDownvoteAnswer(question, answer, user=session['user']['_id'])
+        return "ok"
+    return redirect(url_for('home'))
+
+@app.route('/question/<question>/answer', methods=['POST'])
+def answer(question):
+    if 'user' in session:
+        answer = request.form.get('answer')
+        database.addAnswer(question, session['user']['_id'], answer)
+        return redirect(url_for('question', id=question))
     return redirect(url_for('home'))
 
 @app.route('/logout')
