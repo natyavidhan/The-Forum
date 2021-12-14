@@ -4,17 +4,14 @@
     grid-template-rows: repeat(4, 1fr);
 }
 .settings{
-    background-color: aquamarine;
     grid-column: span 4;
 }
 .sections{
-    background-color: #f0f0f0;
     grid-row: span 3;
 }
 
 @media screen and (max-width: 768px){
     .sections{
-        background-color: #f0f0f0;
         grid-row: span 3;
         visibility: hidden;
         position: absolute;
@@ -27,7 +24,6 @@
 }
 
 .questions{
-    background-color: #b0ffa3;
     grid-column: span 4;
     grid-row: span 3;
 }
